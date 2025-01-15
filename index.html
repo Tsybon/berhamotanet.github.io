@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Час без бергамоту</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --text-color: #ecf0f1;
+            --dark-bg: #1a1a1a;
+            --nixie-on: #ff8b1f;
+            --nixie-off: #4a1b00;
+            --nixie-glow: #ff6600;
+        }
+
+        @keyframes tubeLight {
+            0% { text-shadow: 0 0 10px var(--nixie-glow), 0 0 20px var(--nixie-glow), 0 0 30px var(--nixie-glow); }
+            50% { text-shadow: 0 0 12px var(--nixie-glow), 0 0 22px var(--nixie-glow), 0 0 32px var(--nixie-glow); }
+            100% { text-shadow: 0 0 10px var(--nixie-glow), 0 0 20px var(--nixie-glow), 0 0 30px var(--nixie-glow); }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            color: #bdc3c7;
+        }
+
+        .nixie-clock {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+            padding: 30px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 20px;
+            box-shadow: 
+                0 0 40px rgba(0,0,0,0.5),
+                inset 0 0 20px rgba(255,139,31,0.1);
+        }
+
+        .nixie-tube {
+            position: relative;
+            width: 100px;
+            height: 160px;
+            background: linear-gradient(135deg, rgba(40,40,40,0.6), rgba(20,20,20,0.8));
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nixie-tube::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(90deg, 
+                    rgba(255,255,255,0.1) 0%, 
+                    transparent 50%, 
+                    rgba(255,255,255,0.1) 100%);
+            border-radius: 10px;
+            pointer-events: none;
+        }
+
+        .nixie-digit {
+            font-family: "Courier New", monospace;
+            font-size: 100px;
+            font-weight: bold;
+            color: var(--nixie-on);
+            animation: tubeLight 2s infinite;
+            position: relative;
+            line-height: 1;
+        }
+
+        .unit-label {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: var(--nixie-on);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--nixie-glow);
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+            height: 160px;
+        }
+
+        .separator::after {
+            content: ':';
+            font-size: 80px;
+            color: var(--nixie-on);
+            text-shadow: 0 0 10px var(--nixie-glow);
+            animation: tubeLight 2s infinite;
+        }
+
+        .nixie-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nixie-pair {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: rgba(45, 45, 45, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--nixie-on);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--nixie-on);
+            text-shadow: 0 0 10px var(--nixie-glow);
+        }
+
+        .stat-label {
+            color: #95a5a6;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            color: var(--nixie-on);
+            text-shadow: 0 0 5px var(--nixie-glow);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .nixie-tube {
+                width: 60px;
+                height: 100px;
+            }
+
+            .nixie-digit {
+                font-size: 60px;
+            }
+
+            .separator::after {
+                font-size: 50px;
+            }
+
+            .stat-card {
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="content">
+            <h1>Шлях без бергамоту</h1>
+            <p class="subtitle">Кожна секунда - крок до нових відкриттів</p>
+            
+            <div class="nixie-clock">
+                <div class="nixie-group">
+                    <div class="nixie-pair">
+                        <div class="nixie-tube">
+                            <div class="nixie-digit" id="days-tens">0</div>
+                        </div>
+                        <div class="nixie-tube">
+                            <div class="nixie-digit" id="days-ones">0</div>
+                        </div>
+                    </div>
+                    <div class="unit-label">днів</div>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="nixie-group">
+                    <div class="nixie-pair">
+                        <div class="nixie-tube">
+                            <div class="nixie-digit" id="hours-tens">0</div>
+                        </div>
+                        <div class="nixie-tube">
+                            <div class="nixie-digit" id="hours-ones">0</div>
+                        </div>
+                    </div>
+                    <div class="unit-label">годин</div>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="nixie-group">
+                    <div class="nixie-pair">
+                        <div class="nixie-tube">
+                            <div class="nixie-digit" id="minutes-tens">0</div>
+                        </div>
+                        <div class="nixie-tube">
+                            <div class="nixie-digit" id="minutes-ones">0</div>
+                        </div>
+                    </div>
+                    <div class="unit-label">хвилин</div>
+                </div>
+
+                <div class="separator"></div>
+
+                <div class="nixie-group">
+                    <div class="nixie-pair">
+                        <div class="nixie-tube">
+                            <div class="nixie-digit" id="seconds-tens">0</div>
+                        </div>
+                        <div class="nixie-tube">
+                            <div class="nixie-digit" id="seconds-ones">0</div>
+                        </div>
+                    </div>
+                    <div class="unit-label">секунд</div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-mug-hot"></i>
+                    </div>
+                    <div class="stat-value" id="cups-saved">0</div>
+                    <div class="stat-label">Чашок не випито</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Сила волі</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value" id="total-hours">0</div>
+                    <div class="stat-label">Годин свободи</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Створено з натхненням та без бергамоту
+    </div>
+
+    <script>
+        function updateTimer() {
+            const startDate = new Date('2024-12-13T00:00:00');
+            const currentDate = new Date();
+            const difference = Math.abs(currentDate - startDate);
+            
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            
+            // Оновлюємо кожну цифру окремо
+            document.getElementById('days-tens').textContent = Math.floor(days / 10);
+            document.getElementById('days-ones').textContent = days % 10;
+            
+            document.getElementById('hours-tens').textContent = Math.floor(hours / 10);
+            document.getElementById('hours-ones').textContent = hours % 10;
+            
+            document.getElementById('minutes-tens').textContent = Math.floor(minutes / 10);
+            document.getElementById('minutes-ones').textContent = minutes % 10;
+            
+            document.getElementById('seconds-tens').textContent = Math.floor(seconds / 10);
+            document.getElementById('seconds-ones').textContent = seconds % 10;
+
+            // Оновлюємо додаткову статистику
+            const totalHours = Math.floor(difference / (1000 * 60 * 60));
+            const cupsSaved = Math.floor(totalHours / 4);
+            
+            document.getElementById('total-hours').textContent = totalHours.toLocaleString();
+            document.getElementById('cups-saved').textContent = cupsSaved.toLocaleString();
+        }
+
+        // Оновлюємо таймер кожну секунду
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
